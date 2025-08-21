@@ -14,50 +14,55 @@ interface ScreenWrapperProps {
   children: React.ReactNode;
   style?: ViewStyle;
   title?: string;
+  topColor?: string;
+  bottomColor?: string;
 }
-
-const { height } = Dimensions.get("window");
 
 const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   children,
   style,
   title = "Welcome",
+  topColor = "#00D09E",
+  bottomColor = "#00D09E",
 }) => {
-  const paddingTop =
-    Platform.OS === "ios" ? height * 0.06 : StatusBar.currentHeight || 0;
-
   return (
-    <SafeAreaView style={[styles.container, { paddingTop }, style]}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#00D09E"
-        translucent
-      />
+    <View style={[styles.container, { backgroundColor: bottomColor }]}>
+      <SafeAreaView style={[styles.topSafeArea, { backgroundColor: topColor }]}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor={topColor}
+          translucent
+        />
 
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{title}</Text>
-      </View>
+        <View style={[styles.header, { backgroundColor: topColor }]}>
+          <Text style={styles.headerTitle}>{title}</Text>
+        </View>
+      </SafeAreaView>
 
-      {children}
-    </SafeAreaView>
+      <View style={styles.contentContainer}>{children}</View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  topSafeArea: {
     backgroundColor: "#00D09E",
   },
   header: {
     height: 120,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#00D09E",
   },
   headerTitle: {
     fontSize: 36,
     fontWeight: "bold",
     color: "#fff",
+  },
+  contentContainer: {
+    flex: 1,
   },
 });
 

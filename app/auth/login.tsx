@@ -16,7 +16,7 @@ const LoginScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <ScreenWrapper title="Welcome">
+    <ScreenWrapper title="Welcome" topColor="#00D09E" bottomColor="#fff">
       <View style={styles.contentCard}>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Email</Text>
