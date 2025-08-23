@@ -1,17 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useSignIn } from "@clerk/clerk-expo";
-import { GoogleSignInButton } from "@/components/GoogleSignInButton";
-import AuthButton from "@/components/AuthButton";
+import {
+  GoogleSignInButton,
+  FormButton,
+  FormInput,
+  FormLink,
+} from "@/components/auth";
 
 const SignInScreen = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
@@ -19,7 +16,6 @@ const SignInScreen = () => {
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const onSignInPress = async () => {
     if (!isLoaded) {
@@ -52,38 +48,24 @@ const SignInScreen = () => {
   return (
     <ScreenWrapper title="Welcome" topColor="#00D09E" bottomColor="#fff">
       <View style={styles.contentCard}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Email</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="ejemplo@ejemplo.com"
-            placeholderTextColor="#999"
-            value={emailAddress}
-            onChangeText={setEmailAddress}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
+        <FormInput
+          label="Email"
+          value={emailAddress}
+          onChangeText={setEmailAddress}
+          placeholder="ejemplo@ejemplo.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Password</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={[styles.textInput, styles.passwordInput]}
-              placeholder="Ingresa tu contraseña"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            ></TouchableOpacity>
-          </View>
-        </View>
+        <FormInput
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Ingresa tu contraseña"
+          secureTextEntry={true}
+        />
 
-        <AuthButton title="Log In" onPress={onSignInPress} variant="primary" />
+        <FormButton title="Log In" onPress={onSignInPress} variant="primary" />
 
         <TouchableOpacity style={styles.forgotPasswordLink}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
@@ -97,17 +79,11 @@ const SignInScreen = () => {
           <GoogleSignInButton />
         </View>
 
-        <View style={styles.accountLinkContainer}>
-          <Text style={styles.accountLinkText}>
-            Don&apos;t have an account?{" "}
-            <Text
-              style={styles.accountLinkHighlight}
-              onPress={() => router.push("/(auth)/sign-up")}
-            >
-              Sign Up
-            </Text>
-          </Text>
-        </View>
+        <FormLink
+          text="Don't have an account?"
+          linkText="Sign Up"
+          onPress={() => router.push("/(auth)/sign-up")}
+        />
       </View>
     </ScreenWrapper>
   );
@@ -140,35 +116,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
   },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
-  textInput: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#e1e5e9",
-  },
-  passwordContainer: {
-    position: "relative",
-  },
-  passwordInput: {
-    paddingRight: 50,
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 16,
-    top: 14,
-  },
+
   forgotPasswordLink: {
     alignItems: "center",
     marginTop: 15,
@@ -203,16 +151,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 20,
     marginBottom: 30,
-  },
-  accountLinkContainer: {
-    alignItems: "center",
-  },
-  accountLinkText: {
-    color: "#666",
-    fontSize: 14,
-  },
-  accountLinkHighlight: {
-    color: "#007AFF",
-    fontWeight: "600",
   },
 });

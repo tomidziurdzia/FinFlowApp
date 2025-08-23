@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-interface AuthButtonProps {
+interface FormButtonProps {
   title: string;
   onPress: () => void;
   variant?: "primary" | "secondary";
@@ -9,7 +9,7 @@ interface AuthButtonProps {
   fullWidth?: boolean;
 }
 
-const AuthButton: React.FC<AuthButtonProps> = ({
+const FormButton: React.FC<FormButtonProps> = ({
   title,
   onPress,
   variant = "primary",
@@ -91,4 +91,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AuthButton;
+export default FormButton;

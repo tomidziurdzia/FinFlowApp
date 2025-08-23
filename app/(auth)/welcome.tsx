@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import AuthButton from "@/components/AuthButton";
+import { FormButton } from "@/components/auth";
 
 const WelcomePage = () => {
   const router = useRouter();
@@ -13,14 +13,14 @@ const WelcomePage = () => {
       <Text style={styles.subtitle}>Manage your finances with ease</Text>
 
       <View style={styles.buttonsContainer}>
-        <AuthButton
+        <FormButton
           title="Log In"
           onPress={() => router.push("/(auth)/sign-in")}
           variant="primary"
           fullWidth={true}
         />
 
-        <AuthButton
+        <FormButton
           title="Sign Up"
           onPress={() => router.push("/(auth)/sign-up")}
           variant="secondary"

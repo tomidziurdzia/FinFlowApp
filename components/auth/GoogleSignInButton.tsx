@@ -2,9 +2,6 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 import { useOAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-
-WebBrowser.maybeCompleteAuthSession();
 
 export const GoogleSignInButton = () => {
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
@@ -18,11 +15,11 @@ export const GoogleSignInButton = () => {
         setActive!({ session: createdSessionId });
         router.replace("/(home)");
       }
-    } catch (err: any) {
-      console.error("OAuth error:", err);
+    } catch (err) {
       Alert.alert("Error", "Error al iniciar sesión con Google");
+      console.error("OAuth error", err);
     }
-  }, [router, startOAuthFlow]);
+  }, []);
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
