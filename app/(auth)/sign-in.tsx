@@ -1,35 +1,33 @@
-import * as React from "react";
+import React, { useState } from "react";
 import {
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-  StyleSheet,
   Alert,
 } from "react-native";
-import { useSignIn } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
-import { GoogleSignInButton } from "../../components/GoogleSignInButton";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import { useSignIn } from "@clerk/clerk-expo";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import AuthButton from "@/components/AuthButton";
 
-export default function SignInScreen() {
+const SignInScreen = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignUp = () => {
-    router.push("/(auth)/sign-up");
-  };
-
-  // Handle the submission of the sign-in form
   const onSignInPress = async () => {
     if (!isLoaded) {
       return;
     }
 
     if (!emailAddress || !password) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert("Error", "Please complete all fields");
       return;
     }
 
@@ -39,134 +37,182 @@ export default function SignInScreen() {
         password,
       });
 
-      // If sign-in process is complete, set the created session as active
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
         router.replace("/(home)");
       } else {
-        Alert.alert("Error", "Inicio de sesión incompleto");
+        Alert.alert("Error", "Sign in incomplete");
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err: any) {
-      Alert.alert(
-        "Error",
-        err.errors?.[0]?.message || "Error al iniciar sesión"
-      );
+      Alert.alert("Error", err.errors?.[0]?.message || "Error signing in");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Iniciar sesión</Text>
-      <Text style={styles.subtitle}>Bienvenido de vuelta</Text>
+    <ScreenWrapper title="Welcome" topColor="#00D09E" bottomColor="#fff">
+      <View style={styles.contentCard}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Email</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="ejemplo@ejemplo.com"
+            placeholderTextColor="#999"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
 
-      <GoogleSignInButton />
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.textInput, styles.passwordInput]}
+              placeholder="Ingresa tu contraseña"
+              placeholderTextColor="#999"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            ></TouchableOpacity>
+          </View>
+        </View>
 
-      <View style={styles.divider}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>o</Text>
-        <View style={styles.dividerLine} />
-      </View>
+        <AuthButton title="Log In" onPress={onSignInPress} variant="primary" />
 
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Ingresa tu email"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        keyboardType="email-address"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Ingresa tu contraseña"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-        <Text style={styles.buttonText}>Continuar</Text>
-      </TouchableOpacity>
-
-      <View style={styles.linkContainer}>
-        <Text style={styles.text}>¿No tienes una cuenta? </Text>
-        <TouchableOpacity onPress={handleSignUp}>
-          <Text style={styles.linkText}>Regístrate</Text>
+        <TouchableOpacity style={styles.forgotPasswordLink}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
+
+        <View style={styles.separator}>
+          <Text style={styles.separatorText}>or sign up with</Text>
+        </View>
+
+        <View style={styles.socialButtonsContainer}>
+          <GoogleSignInButton />
+        </View>
+
+        <View style={styles.accountLinkContainer}>
+          <Text style={styles.accountLinkText}>
+            Don&apos;t have an account?{" "}
+            <Text
+              style={styles.accountLinkHighlight}
+              onPress={() => router.push("/(auth)/sign-up")}
+            >
+              Sign Up
+            </Text>
+          </Text>
+        </View>
       </View>
-    </View>
+    </ScreenWrapper>
   );
-}
+};
+
+export default SignInScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  contentCard: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    marginTop: -20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  title: {
-    fontSize: 28,
+  cardTitle: {
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
     color: "#333",
-  },
-  subtitle: {
-    fontSize: 16,
     textAlign: "center",
     marginBottom: 30,
-    color: "#666",
   },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ddd",
-  },
-  dividerText: {
-    marginHorizontal: 15,
-    color: "#666",
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 10,
+  inputContainer: {
     marginBottom: 20,
   },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
+  inputLabel: {
     fontSize: 16,
     fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
   },
-  linkContainer: {
+  textInput: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#e1e5e9",
+  },
+  passwordContainer: {
+    position: "relative",
+  },
+  passwordInput: {
+    paddingRight: 50,
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 16,
+    top: 14,
+  },
+  forgotPasswordLink: {
+    alignItems: "center",
+    marginTop: 15,
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    color: "#666",
+    fontSize: 14,
+  },
+  fingerprintContainer: {
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  fingerprintText: {
+    color: "#666",
+    fontSize: 14,
+  },
+  fingerprintHighlight: {
+    color: "#007AFF",
+    fontWeight: "600",
+  },
+  separator: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  separatorText: {
+    color: "#999",
+    fontSize: 14,
+  },
+  socialButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    gap: 20,
+    marginBottom: 30,
+  },
+  accountLinkContainer: {
     alignItems: "center",
   },
-  text: {
+  accountLinkText: {
     color: "#666",
-    fontSize: 16,
+    fontSize: 14,
   },
-  linkText: {
+  accountLinkHighlight: {
     color: "#007AFF",
-    fontSize: 16,
     fontWeight: "600",
   },
 });

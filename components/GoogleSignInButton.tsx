@@ -22,26 +22,29 @@ export const GoogleSignInButton = () => {
       console.error("OAuth error:", err);
       Alert.alert("Error", "Error al iniciar sesión con Google");
     }
-  }, []);
+  }, [router, startOAuthFlow]);
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <Text style={styles.buttonText}>Continuar con Google</Text>
+      <Text style={styles.buttonText}>G</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#4285F4",
-    padding: 16,
-    borderRadius: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e1e5e9",
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
   },
   buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#666",
   },
 });

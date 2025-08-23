@@ -13,7 +13,7 @@ const LaunchScreen = () => {
     if (isSignedIn) {
       router.replace("/(home)");
     } else {
-      router.replace("/(auth)/sign-in");
+      router.replace("/(auth)/welcome");
     }
   }, [isSignedIn, isLoaded, router]);
 

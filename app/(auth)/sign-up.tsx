@@ -1,226 +1,149 @@
-import * as React from "react";
+import React, { useState } from "react";
 import {
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
-  StyleSheet,
   Alert,
 } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
-import { GoogleSignInButton } from "../../components/GoogleSignInButton";
+import ScreenWrapper from "@/components/ScreenWrapper";
+import { useSignUp } from "@clerk/clerk-expo";
+import AuthButton from "@/components/AuthButton";
 
-export default function SignUpScreen() {
+const SignUpScreen = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [pendingVerification, setPendingVerification] = React.useState(false);
-  const [code, setCode] = React.useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSignIn = () => {
     router.push("/(auth)/sign-in");
   };
 
-  // Handle submission of sign-up form
   const onSignUpPress = async () => {
     if (!isLoaded) return;
 
     if (!emailAddress || !password) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert("Error", "Please complete all fields");
       return;
     }
 
     try {
-      await signUp.create({
+      const signUpAttempt = await signUp.create({
         emailAddress,
         password,
       });
 
-      // Send user an email with verification code
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
-      // Set 'pendingVerification' to true to display second form
-      setPendingVerification(true);
-    } catch (err: any) {
-      Alert.alert("Error", err.errors?.[0]?.message || "Error al registrarse");
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
-
-  // Handle submission of verification form
-  const onVerifyPress = async () => {
-    if (!isLoaded) return;
-
-    if (!code) {
-      Alert.alert("Error", "Por favor ingresa el código de verificación");
-      return;
-    }
-
-    try {
-      // Use the code the user provided to attempt verification
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
-      });
-
-      // If verification was completed, set the session to active
       if (signUpAttempt.status === "complete") {
         await setActive({ session: signUpAttempt.createdSessionId });
         router.replace("/(home)");
       } else {
-        Alert.alert("Error", "Verificación incompleta");
+        Alert.alert("Error", "Sign up incomplete");
         console.error(JSON.stringify(signUpAttempt, null, 2));
       }
     } catch (err: any) {
-      Alert.alert(
-        "Error",
-        err.errors?.[0]?.message || "Error en la verificación"
-      );
-      console.error(JSON.stringify(err, null, 2));
+      Alert.alert("Error", err.errors?.[0]?.message || "Error signing up");
     }
   };
 
-  if (pendingVerification) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Verifica tu email</Text>
-        <Text style={styles.subtitle}>
-          Te hemos enviado un código de verificación
-        </Text>
+  return (
+    <ScreenWrapper title="Create Account" topColor="#00D09E" bottomColor="#fff">
+      <View style={styles.contentCard}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Email</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="example@example.com"
+            placeholderTextColor="#999"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
 
-        <TextInput
-          style={styles.input}
-          value={code}
-          placeholder="Ingresa tu código de verificación"
-          onChangeText={(code) => setCode(code)}
-          keyboardType="number-pad"
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Enter your password"
+            placeholderTextColor="#999"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+          />
+        </View>
+
+        <AuthButton
+          title="Create Account"
+          onPress={onSignUpPress}
+          variant="primary"
         />
 
-        <TouchableOpacity style={styles.button} onPress={onVerifyPress}>
-          <Text style={styles.buttonText}>Verificar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setPendingVerification(false)}>
-          <Text style={styles.linkText}>Volver</Text>
-        </TouchableOpacity>
+        <View style={styles.accountLinkContainer}>
+          <Text style={styles.accountLinkText}>
+            Already have an account?{" "}
+            <Text style={styles.accountLinkHighlight} onPress={handleSignIn}>
+              Sign In
+            </Text>
+          </Text>
+        </View>
       </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Crear cuenta</Text>
-      <Text style={styles.subtitle}>Regístrate para comenzar</Text>
-
-      <GoogleSignInButton />
-
-      <View style={styles.divider}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>o</Text>
-        <View style={styles.dividerLine} />
-      </View>
-
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Ingresa tu email"
-        onChangeText={(email) => setEmailAddress(email)}
-        keyboardType="email-address"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Ingresa tu contraseña"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-
-      <TouchableOpacity style={styles.button} onPress={onSignUpPress}>
-        <Text style={styles.buttonText}>Continuar</Text>
-      </TouchableOpacity>
-
-      <View style={styles.linkContainer}>
-        <Text style={styles.text}>¿Ya tienes una cuenta? </Text>
-        <TouchableOpacity onPress={handleSignIn}>
-          <Text style={styles.linkText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScreenWrapper>
   );
-}
+};
+
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  contentCard: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    marginTop: -20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-    color: "#333",
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 30,
-    color: "#666",
-  },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ddd",
-  },
-  dividerText: {
-    marginHorizontal: 15,
-    color: "#666",
-    fontSize: 16,
-  },
-  input: {
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 10,
+  inputContainer: {
     marginBottom: 20,
   },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
+  inputLabel: {
     fontSize: 16,
     fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
   },
-  linkContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
+  textInput: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#e1e5e9",
+  },
+
+  accountLinkContainer: {
     alignItems: "center",
   },
-  text: {
+  accountLinkText: {
     color: "#666",
-    fontSize: 16,
+    fontSize: 14,
   },
-  linkText: {
+  accountLinkHighlight: {
     color: "#007AFF",
-    fontSize: 16,
     fontWeight: "600",
   },
 });
