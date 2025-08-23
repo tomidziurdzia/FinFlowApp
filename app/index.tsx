@@ -7,7 +7,7 @@ const LaunchScreen = () => {
 
   useEffect(() => {
     const navigationTimer = setTimeout(() => {
-      router.push("/auth/welcome");
+      router.push("/(home)");
     }, 1000);
 
     return () => {
