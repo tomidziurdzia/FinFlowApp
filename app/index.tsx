@@ -1,19 +1,33 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import { useEffect } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 
 const LaunchScreen = () => {
+  const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const navigationTimer = setTimeout(() => {
-      router.push("/(home)");
-    }, 1000);
+    if (!isLoaded) return;
 
-    return () => {
-      clearTimeout(navigationTimer);
-    };
-  }, [router]);
+    if (isSignedIn) {
+      router.replace("/(home)");
+    } else {
+      router.replace("/(auth)/sign-in");
+    }
+  }, [isSignedIn, isLoaded, router]);
+
+  if (!isLoaded) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require("../assets/images/icon.png")}
+          style={styles.logo}
+        />
+        <Text style={styles.text}>FinFlow</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
