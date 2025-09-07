@@ -9,7 +9,7 @@ export const SignOutButton = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace("/");
+      router.replace("/(auth)/sign-in");
     } catch (err: any) {
       Alert.alert("Error", "Error al cerrar sesión");
       console.error(JSON.stringify(err, null, 2));

@@ -13,21 +13,9 @@ const LaunchScreen = () => {
     if (isSignedIn) {
       router.replace("/(home)");
     } else {
-      router.replace("/(auth)/welcome");
+      router.replace("/(auth)/sign-in");
     }
   }, [isSignedIn, isLoaded, router]);
-
-  if (!isLoaded) {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={require("../assets/images/icon.png")}
-          style={styles.logo}
-        />
-        <Text style={styles.text}>FinFlow</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

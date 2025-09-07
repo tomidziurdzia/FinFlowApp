@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import { useSignUp } from "@clerk/clerk-expo";
-import { FormButton, FormInput, FormLink } from "@/components/auth";
+import { useSignUp, isClerkAPIResponseError } from "@clerk/clerk-expo";
+import { CustomButton, CustomInput, CustomLink } from "@/components/auth";
 
 const SignUpScreen = () => {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { isLoaded, signUp } = useSignUp();
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignIn = () => {
     router.push("/(auth)/sign-in");
@@ -20,32 +21,46 @@ const SignUpScreen = () => {
     if (!isLoaded) return;
 
     if (!emailAddress || !password) {
-      Alert.alert("Error", "Please complete all fields");
+      Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const signUpAttempt = await signUp.create({
+      // Crear el usuario
+      await signUp.create({
         emailAddress,
         password,
       });
 
-      if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId });
-        router.replace("/(home)");
-      } else {
-        Alert.alert("Error", "Sign up incomplete");
-        console.error(JSON.stringify(signUpAttempt, null, 2));
-      }
+      // Preparar la verificación por email
+      await signUp.prepareVerification({ strategy: "email_code" });
+
+      // Navegar a la pantalla de verificación
+      router.push("/(auth)/verify");
     } catch (err: any) {
-      Alert.alert("Error", err.errors?.[0]?.message || "Error signing up");
+      console.log("Error en sign up: ", err);
+
+      if (isClerkAPIResponseError(err)) {
+        // Manejar errores específicos de Clerk
+        const errorMessage =
+          err.errors?.[0]?.longMessage ||
+          err.errors?.[0]?.message ||
+          "Error al crear la cuenta";
+        Alert.alert("Error", errorMessage);
+      } else {
+        Alert.alert("Error", "Error desconocido al crear la cuenta");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <ScreenWrapper title="Create Account" topColor="#00D09E" bottomColor="#fff">
       <View style={styles.contentCard}>
-        <FormInput
+        <CustomInput
           label="Email"
           value={emailAddress}
           onChangeText={setEmailAddress}
@@ -54,7 +69,7 @@ const SignUpScreen = () => {
           autoCapitalize="none"
         />
 
-        <FormInput
+        <CustomInput
           label="Password"
           value={password}
           onChangeText={setPassword}
@@ -62,13 +77,14 @@ const SignUpScreen = () => {
           secureTextEntry={true}
         />
 
-        <FormButton
-          title="Create Account"
+        <CustomButton
+          title={isLoading ? "Creando cuenta..." : "Crear cuenta"}
           onPress={onSignUpPress}
           variant="primary"
+          disabled={isLoading}
         />
 
-        <FormLink
+        <CustomLink
           text="Already have an account?"
           linkText="Sign In"
           onPress={handleSignIn}
