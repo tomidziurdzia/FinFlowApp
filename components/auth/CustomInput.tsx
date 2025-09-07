@@ -14,6 +14,7 @@ interface FormInputProps {
     | "phone-pad"
     | "number-pad";
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  maxLength?: number;
   error?: string;
 }
 
@@ -25,6 +26,7 @@ const FormInput: React.FC<FormInputProps> = ({
   secureTextEntry = false,
   keyboardType = "default",
   autoCapitalize = "sentences",
+  maxLength,
   error,
 }) => {
   return (
@@ -39,6 +41,7 @@ const FormInput: React.FC<FormInputProps> = ({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        maxLength={maxLength}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>

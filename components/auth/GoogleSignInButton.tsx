@@ -19,7 +19,7 @@ export const GoogleSignInButton = () => {
       Alert.alert("Error", "Error al iniciar sesión con Google");
       console.error("OAuth error", err);
     }
-  }, []);
+  }, [router, startOAuthFlow]);
 
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
