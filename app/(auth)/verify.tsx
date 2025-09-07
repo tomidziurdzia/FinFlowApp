@@ -4,10 +4,13 @@ import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useSignUp, isClerkAPIResponseError } from "@clerk/clerk-expo";
 import { CustomButton, CustomInput } from "@/components/auth";
+import { useApiCall } from "@/utils/api";
+import { createSyncUser } from "@/utils/sync-user";
 
 const VerifyScreen = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
+  const { apiCall } = useApiCall();
 
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +37,33 @@ const VerifyScreen = () => {
 
       if (signUpAttempt.status === "complete") {
         await setActive({ session: signUpAttempt.createdSessionId });
+
+        // Sincronizar usuario con el backend después de la verificación exitosa
+        try {
+          // Crear un objeto user temporal para la sincronización
+          const tempUser = {
+            id: signUpAttempt.createdUserId,
+            emailAddresses: [{ emailAddress: signUpAttempt.emailAddress }],
+            firstName: signUpAttempt.firstName || "",
+            lastName: signUpAttempt.lastName || "",
+            imageUrl: "",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } as any;
+
+          const syncUserFn = createSyncUser(apiCall);
+          await syncUserFn(tempUser);
+
+          console.log("Usuario sincronizado exitosamente con el backend");
+        } catch (syncError: any) {
+          console.error(
+            "Error al sincronizar usuario con el backend:",
+            syncError
+          );
+          // No mostramos error al usuario ya que la verificación fue exitosa
+          // Solo logueamos el error para debugging
+        }
+
         router.replace("/(home)");
       } else {
         Alert.alert("Error", "No se pudo completar la verificación");
