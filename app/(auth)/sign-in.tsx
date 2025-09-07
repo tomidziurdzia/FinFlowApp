@@ -7,7 +7,7 @@ import {
   GoogleSignInButton,
   CustomButton,
   CustomInput,
-  FormLink,
+  CustomLink,
 } from "@/components/auth";
 
 const SignInScreen = () => {
@@ -83,7 +83,7 @@ const SignInScreen = () => {
           <GoogleSignInButton />
         </View>
 
-        <FormLink
+        <CustomLink
           text="Don't have an account?"
           linkText="Sign Up"
           onPress={() => router.push("/(auth)/sign-up")}

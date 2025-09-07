@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useSignUp } from "@clerk/clerk-expo";
-import { CustomButton, CustomInput, FormLink } from "@/components/auth";
+import { CustomButton, CustomInput, CustomLink } from "@/components/auth";
 
 const SignUpScreen = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -68,7 +68,7 @@ const SignUpScreen = () => {
           variant="primary"
         />
 
-        <FormLink
+        <CustomLink
           text="Already have an account?"
           linkText="Sign In"
           onPress={handleSignIn}

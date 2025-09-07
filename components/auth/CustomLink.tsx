@@ -1,14 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-interface FormLinkProps {
+interface CustomLinkProps {
   text: string;
   linkText: string;
   onPress: () => void;
   align?: "center" | "flex-start" | "flex-end";
 }
 
-const FormLink: React.FC<FormLinkProps> = ({
+const CustomLink: React.FC<CustomLinkProps> = ({
   text,
   linkText,
   onPress,
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FormLink;
+export default CustomLink;
