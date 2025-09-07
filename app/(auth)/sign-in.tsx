@@ -5,8 +5,8 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import { useSignIn } from "@clerk/clerk-expo";
 import {
   GoogleSignInButton,
-  FormButton,
-  FormInput,
+  CustomButton,
+  CustomInput,
   FormLink,
 } from "@/components/auth";
 
@@ -48,7 +48,7 @@ const SignInScreen = () => {
   return (
     <ScreenWrapper title="Welcome" topColor="#00D09E" bottomColor="#fff">
       <View style={styles.contentCard}>
-        <FormInput
+        <CustomInput
           label="Email"
           value={emailAddress}
           onChangeText={setEmailAddress}
@@ -57,7 +57,7 @@ const SignInScreen = () => {
           autoCapitalize="none"
         />
 
-        <FormInput
+        <CustomInput
           label="Password"
           value={password}
           onChangeText={setPassword}
@@ -65,7 +65,11 @@ const SignInScreen = () => {
           secureTextEntry={true}
         />
 
-        <FormButton title="Log In" onPress={onSignInPress} variant="primary" />
+        <CustomButton
+          title="Log In"
+          onPress={onSignInPress}
+          variant="primary"
+        />
 
         <TouchableOpacity style={styles.forgotPasswordLink}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>

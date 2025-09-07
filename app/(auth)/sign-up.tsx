@@ -3,7 +3,7 @@ import { View, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useSignUp } from "@clerk/clerk-expo";
-import { FormButton, FormInput, FormLink } from "@/components/auth";
+import { CustomButton, CustomInput, FormLink } from "@/components/auth";
 
 const SignUpScreen = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -45,7 +45,7 @@ const SignUpScreen = () => {
   return (
     <ScreenWrapper title="Create Account" topColor="#00D09E" bottomColor="#fff">
       <View style={styles.contentCard}>
-        <FormInput
+        <CustomInput
           label="Email"
           value={emailAddress}
           onChangeText={setEmailAddress}
@@ -54,7 +54,7 @@ const SignUpScreen = () => {
           autoCapitalize="none"
         />
 
-        <FormInput
+        <CustomInput
           label="Password"
           value={password}
           onChangeText={setPassword}
@@ -62,7 +62,7 @@ const SignUpScreen = () => {
           secureTextEntry={true}
         />
 
-        <FormButton
+        <CustomButton
           title="Create Account"
           onPress={onSignUpPress}
           variant="primary"
